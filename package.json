@@ -1,5 +1,5 @@
 {
-  "name": "qpack-viewer-web",
+  "name": "qpack-viewer",
   "version": "0.1.0",
   "private": true,
   "scripts": {
