@@ -21,12 +21,13 @@ export class TableEntry {
     /**
      * display: Display the content of the entry
      */
-    public display(fieldType: qpackFieldLineType): string {
-        return JSON.stringify({
-            encoded_type: fieldType,
-            name: this.name,
-            value: this.value,
-        }, null, 4);
+    public display(fieldType: qpackFieldLineType): Map<string, string | number> {
+        return new Map<string, string | number>([
+            ['Field Line Encode Type', qpackFieldLineType[fieldType]],
+            ["Referenced Table",       "Static Table"],
+            ['Name',                   this.name],
+            ['Value',                  this.value],
+        ]);
     }
 }
 

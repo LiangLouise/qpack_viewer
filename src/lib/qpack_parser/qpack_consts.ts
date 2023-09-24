@@ -6,11 +6,15 @@ export enum qpackFieldLineType {
     Literal_Field_Line_With_Literal_Name,
 }
 
-export interface fieldLine {
-    encoded_type: qpackFieldLineType,
-
-    display(): string
+export interface frameSegment {
+    display(): frameSegmentMap
 }
+
+export interface fieldLine extends frameSegment {
+    encoded_type: qpackFieldLineType
+}
+
+export type frameSegmentMap = Map<string, string | number | boolean>;
 
 export enum parsingHeadersFrameState {
     parse_frame_header,

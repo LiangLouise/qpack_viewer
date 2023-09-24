@@ -1,6 +1,5 @@
 import { static_table } from "./static_table";
-import { qpackFieldLineType, fieldLine } from "./qpack_consts";
-
+import { qpackFieldLineType, fieldLine, frameSegmentMap } from "./qpack_consts";
 
 export class indexedLine implements fieldLine {
     encoded_type: qpackFieldLineType;
@@ -27,9 +26,14 @@ export class indexedLine implements fieldLine {
         return new indexedLine(index, false, true);
     }
 
-    display(): string {
+    display(): frameSegmentMap {
         if (!this.is_static) {
-            return JSON.stringify(this, null, 4);
+            return new Map<string, string | number | boolean>([
+                ["Field Line Encode Type", qpackFieldLineType[this.encoded_type]],
+                ["Referenced Table",       "Dynamic Table"],
+                ["Dynamic Table Index",    this.index],
+                ["Is Post Base",           this.is_post_base],
+            ]);
         }
         return static_table[this.index].display(this.encoded_type);
     }
@@ -70,11 +74,27 @@ export class nameIndexedLine implements fieldLine {
         return new nameIndexedLine(name_index, line_val, false, true, is_huffman, never_encode);
     }
 
-    display(): string {
+    display(): frameSegmentMap {
+        const val_fields = new Map<string, string | number | boolean>([
+            ["Line Value",            this.line_val],
+            ["Value Huffman Encoded", this.is_val_huffman],
+            ["Never Encode",          this.never_encode],
+        ]);
+
         if (!this.is_static) {
-            return JSON.stringify(this, null, 4);
+            return new Map<string, string | number | boolean>([
+                ["Field Line Encode Type",   qpackFieldLineType[this.encoded_type]],
+                ["Referenced Table",         "Dynamic Table"],
+                ["Line Name Index",          this.name_index],
+                ["Is Post Base",             this.is_post_base],
+                ...val_fields,
+            ]);
         }
-        return static_table[this.name_index].display(this.encoded_type);
+
+        return new Map<string, string | number | boolean>([
+            ...static_table[this.name_index].display(this.encoded_type),
+            ...val_fields
+        ]);
     }
 }
 
@@ -106,7 +126,17 @@ export class literalLine implements fieldLine {
         return new literalLine(line_name, line_val, is_name_huffman, is_val_huffman, never_encode);
     }
 
-    display(): string {
-        return JSON.stringify(this, null, 4);
+    display(): frameSegmentMap {
+        return new Map<string, string | number | boolean>([
+            ["Field Line Encode Type",   qpackFieldLineType[this.encoded_type]],
+
+            ["Line Name",                this.line_name],
+            ["Name Huffman Encoded",     this.is_name_huffman],
+
+            ["Line Value",               this.line_val],
+            ["Value Huffman Encoded",    this.is_val_huffman],
+
+            ["Never Encode",             this.never_encode],
+        ]);
     }
 }

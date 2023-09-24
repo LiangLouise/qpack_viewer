@@ -5,10 +5,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, PropType } from 'vue';
 
 import DataTable from "primevue/datatable";
 import Column from "primevue/column";
+
+import { frameSegment } from '../lib/qpack_parser';
 
 export default defineComponent({
     name: 'DataEntry',
@@ -27,17 +29,15 @@ export default defineComponent({
     computed: {
         get_values() {
             let table_data = [];
-                for (const key in this.data) {
-                    if (Object.prototype.hasOwnProperty.call(this.data, key)) {
-                        const element = this.data[key];
-                        table_data.push({ key: key, value: element });
-                    }
-                }
-                return table_data;
+            console.log(this.data.display());
+            for (const [key, val] of this.data.display()) {
+                table_data.push({ key: key, value: val });
+            }
+            return table_data;
         }
     },
     props: {
-        data: { type: Object, required: true }
+        data: { type: Object as PropType<frameSegment>, required: true }
     },
 });
 </script>

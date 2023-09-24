@@ -1,19 +1,47 @@
 import { varint_decode, quic_varint_decode } from "./prefix_int_decoder";
 import { res_status } from "./status";
-import { qpackFieldLineType, fieldLine, parsingHeadersFrameState, parsingFieldLineState, HTTP3FrameType } from "./qpack_consts";
+import { qpackFieldLineType, fieldLine, parsingHeadersFrameState, parsingFieldLineState, HTTP3FrameType, frameSegment, frameSegmentMap } from "./qpack_consts";
 import { indexedLine, literalLine, nameIndexedLine } from "./encoced_line";
 
-export type frameHeader = {
-    frame_type: HTTP3FrameType,
-    frame_header_len: number,
-    frame_payload_len: number,
-}
+export class frameHeader implements frameSegment {
+    frame_type: HTTP3FrameType;
+    frame_header_len: number;
+    frame_payload_len: number;
 
-export type encodedFieldPrefix = {
-    encoded_req_ins_count: number,
-    req_ins_count: number,
-    sign_set: boolean,
-    delta_base: number,
+    constructor() {
+      this.frame_type = HTTP3FrameType.UNKNOWN_FRAME;
+      this.frame_header_len = 0;
+      this.frame_payload_len = 0;
+    }
+
+    display(): frameSegmentMap {
+        return new Map<string, string | number | boolean>([
+            ["Frame Type",        HTTP3FrameType[this.frame_type]],
+            ["Frame Payload Len", this.frame_payload_len],
+        ]);
+    }
+  }
+
+export class encodedFieldPrefix implements frameSegment {
+    encoded_req_ins_count: number;
+    req_ins_count: number;
+    sign_set: boolean;
+    delta_base: number;
+
+    constructor() {
+        this.encoded_req_ins_count = 0;
+        this.req_ins_count = 0;
+        this.sign_set = false;
+        this.delta_base = 0;
+    }
+
+    display(): frameSegmentMap {
+        return new Map<string, string | number | boolean>([
+            ["Required Insert Count", this.encoded_req_ins_count],
+            ["Sign bit Set",          this.sign_set],
+            ["Delta Base",            this.delta_base],
+        ]);
+    }
 }
 
 export class parserContext {
@@ -33,8 +61,8 @@ export class parserContext {
             this.buffer = new Uint8Array();
         }
         this.headers = [];
-        this.header_frame_info = {} as frameHeader;
-        this.prefix = {} as encodedFieldPrefix;
+        this.header_frame_info = new frameHeader();
+        this.prefix = new encodedFieldPrefix();
         this.index = 0;
         this.parse_frame_state = parsingHeadersFrameState.parse_frame_header;
         this.parse_field_state = parsingFieldLineState.parse_no_state;
@@ -335,7 +363,7 @@ export function try_parse_headers_frame(ctx: parserContext): boolean {
     return true;
 }
 
-export { varint_decode, quic_varint_decode } from "./prefix_int_decoder";
-export { res_status } from "./status";
-export { qpackFieldLineType, parsingHeadersFrameState, parsingFieldLineState, HTTP3FrameType } from "./qpack_consts";
-export { indexedLine, literalLine, nameIndexedLine } from "./encoced_line";
+export * from "./prefix_int_decoder";
+export * from "./status";
+export * from "./qpack_consts";
+export * from "./encoced_line";
