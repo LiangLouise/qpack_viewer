@@ -1,6 +1,12 @@
 <template>
     <Toast />
-    <EncodedEditor placeholder="paste the QPACK Headers Hex String"
+    <div class="w-10">
+        <p class="font-medium text-4xl">HTTP/3 QPACK Viewer</p>
+        <p class="font-italic text-base">
+            Disassemble the HEADERS Frame in HTTP/3 Encoded with QPACK Field Compression
+        </p>
+    </div>
+    <EncodedEditor placeholder="paste the QPACK Headers Hex Stream Here"
                    @input_update="recv_hex_input"
                    @input_error="recv_input_error"
     />
@@ -13,6 +19,7 @@ import EncodedEditor from "./components/EncodedEditor.vue";
 import DecodedDisplay from "./components/DecodedDisplay.vue";
 import Toast from "primevue/toast";
 import "primevue/resources/themes/lara-light-indigo/theme.css";
+import "primeflex/primeflex.css";
 
 export default defineComponent({
     name: 'App',
